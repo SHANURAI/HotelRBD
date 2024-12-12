@@ -1,0 +1,377 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: #f8f9fa;
+    color: #333;
+    margin: 20px;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+body > div,
+body > h1,
+body > h2,
+body > form {
+    width: 100%;
+    max-width: 1200px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(45deg, #343a40, #495057);
+    padding: 10px 20px;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 1200px;
+    margin-bottom: 20px;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    margin-right: 15px;
+    transition: color 0.3s;
+}
+
+nav a:hover {
+    color: #ffc107;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li {
+    margin-left: 20px;
+}
+
+button {
+    background: #28a745;
+    border: none;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.3s, transform 0.2s;
+}
+
+button:hover {
+    background: #218838;
+    transform: scale(1.05);
+}
+
+h1, h2, h3 {
+    font-weight: normal;
+    color: #343a40;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center; /* Центрируем карточки */
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto 20px auto;
+    text-align: left; /* Текст в карточках будет слева для удобства чтения */
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    background: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeInUp 0.5s ease forwards;
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    background: #fdfdfd;
+}
+
+.card p {
+    margin: 5px 0;
+    line-height: 1.4;
+}
+
+.card-actions {
+    margin-top: 15px;
+}
+
+.card-actions a {
+    color: #007bff;
+    text-decoration: none;
+    margin-right: 10px;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.card-actions a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* Формы */
+form {
+    display: inline-block; /* Чтобы форма была по контенту и по центру */
+    text-align: left; /* Текст лейблов выровнен слева для удобства */
+    width: 100%;
+    max-width: 400px; /* Ограничиваем ширину формы, чтобы она была по центру */
+}
+
+form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #495057;
+}
+
+form input[type="text"],
+form input[type="number"],
+form input[type="password"],
+form select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background: #fff;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+form input[type="text"]:focus,
+form input[type="number"]:focus,
+form input[type="password"]:focus,
+form select:focus {
+    border-color: #80bdff;
+    outline: none;
+    box-shadow: 0 0 8px rgba(128,189,255,0.5);
+}
+
+form input[readonly] {
+    background: #e9ecef;
+    font-style: italic;
+    color: #6c757d;
+}
+
+form button {
+    background: #28a745;
+    color: #fff;
+    margin-right: 10px;
+    padding: 8px 12px;
+    font-weight: 500;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+form button:hover {
+    background: #218838;
+    transform: translateY(-2px);
+}
+
+form a {
+    color: #343a40;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+form a:hover {
+    color: #495057;
+    text-decoration: underline;
+}
+
+/* Сообщения */
+div.alert {
+    width: 100%;
+    max-width: 400px;
+    text-align: left;
+    padding: 10px;
+    margin: 0 auto 20px auto;
+    border-radius: 4px;
+    font-weight: 500;
+    position: relative;
+    animation: fadeInUp 0.5s ease forwards;
+    opacity: 0;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.alert-dismissible .close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: inherit;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    transition: color 0.3s;
+}
+
+.alert-dismissible .close:hover {
+    color: #000;
+}
+
+/* Пагинация */
+.cards-container + div {
+    text-align: center; /* Центрируем пагинацию */
+}
+
+.cards-container + div a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+    margin: 0 10px;
+}
+
+.cards-container + div a:hover {
+    text-decoration: underline;
+    color: #0056b3;
+}
+
+/* Списки и отступы */
+ul {
+    margin-left: 20px;
+    margin-top: 10px;
+    text-align: left;
+}
+
+li {
+    margin-bottom: 5px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    nav ul {
+        flex-direction: column;
+        margin-top: 10px;
+    }
+
+    nav ul li {
+        margin-left: 0;
+        margin-bottom: 10px;
+    }
+
+    /* По центру остаются те же принципы */
+}
+
+/* Эффекты для изображений */
+.card img {
+    border-radius: 5px;
+    max-width: 100%;
+    height: auto;
+    transition: opacity 0.3s, transform 0.3s;
+    cursor: zoom-in;
+}
+
+.card img:hover {
+    opacity: 0.95;
+    transform: scale(1.02);
+}
+
+/* Плейсхолдеры */
+form input::placeholder {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.edit-button {
+    background: #3dff07;
+    color: #212529;
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.3s, transform 0.2s;
+    margin-right: 5px;
+    display: inline-block;
+}
+
+.edit-button:hover {
+    background: #3dff07;
+    transform: scale(1.05);
+}
+
+.delete-button {
+    background: #dc3545;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.3s, transform 0.2s;
+    display: inline-block;
+}
+
+.delete-button:hover {
+    background: #c82333;
+    transform: scale(1.05);
+}
+
+.hello{
+        color: #fff;
+}

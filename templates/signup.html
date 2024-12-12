@@ -1,0 +1,70 @@
+{% extends 'basic.html' %}
+{% block title %}Регистрация{% endblock title %}
+{% block body %}
+<div>
+    <h2>Регистрация</h2>
+
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form action="{% url 'signup' %}" method="post">
+        {% csrf_token %}
+
+        <div>
+            <input type="checkbox" id="is_staff" name="is_staff" {% if request.POST.is_staff %}checked{% endif %} onchange="toggleFields()">
+            <label for="is_staff">Зарегистрироваться как администратор</label>
+        </div>
+
+        <div id="additional-fields">
+            <label for="full_name">ФИО:</label>
+            <input type="text" id="full_name" name="full_name" placeholder="Введите полное имя" required>
+
+            <label for="year_of_birth">Год рождения:</label>
+            <input type="number" id="year_of_birth" name="year_of_birth" placeholder="Введите год рождения" min="1900" max="2024" required>
+
+            <label for="gender">Пол:</label>
+            <select id="gender" name="gender" required>
+                <option value="М">Мужской</option>
+                <option value="Ж">Женский</option>
+            </select>
+        </div>
+
+        <label for="username">Имя пользователя:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password1">Пароль:</label>
+        <input type="password" id="password1" name="password1" required>
+
+        <label for="password2">Подтвердите пароль:</label>
+        <input type="password" id="password2" name="password2" required>
+
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+</div>
+
+<script>
+    function toggleFields() {
+        const isStaffCheckbox = document.getElementById('is_staff');
+        const additionalFields = document.getElementById('additional-fields');
+
+        // Если чекбокс отмечен, скрываем дополнительные поля
+        if (isStaffCheckbox.checked) {
+            additionalFields.style.display = 'none';
+            // Очищаем значения дополнительных полей, чтобы они не отправлялись
+            document.getElementById('full_name').value = '';
+            document.getElementById('year_of_birth').value = '';
+            document.getElementById('gender').value = '';
+        } else {
+            additionalFields.style.display = 'block';
+        }
+    }
+
+    // Устанавливаем начальное состояние полей
+    document.addEventListener('DOMContentLoaded', toggleFields);
+</script>
+{% endblock body %}

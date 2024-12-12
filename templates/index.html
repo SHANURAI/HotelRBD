@@ -1,0 +1,248 @@
+{% extends 'basic.html' %}
+{% block title %}Гостиница{% endblock title %}
+{% block body %}
+{% load custom_filters %}
+<div>
+    {% if errors %}
+        <div style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 20px;">
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    <h1>Выберите таблицу</h1>
+    <form method="get">
+        <select name="table" onchange="this.form.submit()">
+            <option value="">-- Выберите таблицу --</option>
+            {% for table in tables %}
+                <option value="{{ table }}" {% if selected_table == table %}selected{% endif %}>
+                    {{ table|translate_table }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    {% if selected_table %}
+        {% if not request.user.is_staff and selected_table != "Clients" and selected_table != "Services" and selected_table != "Rooms" or not is_read_only and selected_table == "Services" or request.user.is_staff %}
+            <a href="{% url 'add_record' selected_table %}"
+               style="display: inline-block; margin: 20px 0; padding: 10px 15px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">
+                Добавить запись
+            </a>
+        {% endif %}
+
+        {% if selected_table == "Bookings" and request.user.is_staff %}
+            <form method="get" style="margin-bottom: 20px;">
+                <input type="hidden" name="table" value="Bookings">
+                <button type="submit" name="calculate_total_cost" style="padding: 10px 15px; background-color: #2196F3; color: white; border: none; border-radius: 5px;">
+                    Посчитать общую стоимость бронирований
+                </button>
+            </form>
+
+            {% if total_cost is not None %}
+                <p><strong>Суммарная стоимость всех бронирований:</strong> {{ total_cost }}</p>
+            {% endif %}
+        {% endif %}
+
+        {% if selected_table == "Posts" and request.user.is_staff %}
+            <form method="get" style="margin-bottom: 20px;">
+                <input type="hidden" name="table" value="Posts">
+                <button type="submit" name="increase_salary" style="padding: 10px 15px; background-color: #FF9800; color: white; border: none; border-radius: 5px;">
+                    Увеличить зарплату на 10%
+                </button>
+            </form>
+
+            {% if salary_update_message %}
+                <p><strong>{{ salary_update_message }}</strong></p>
+            {% endif %}
+        {% endif %}
+
+
+        {# Форма фильтрации для каждой таблицы. Поля примерные, адаптируйте под свои нужды #}
+        {% if selected_table == "Rooms" %}
+            <h3>Поиск по параметрам (необязательно):</h3>
+            <form method="get">
+                <input type="hidden" name="table" value="Rooms">
+                <label for="room_id">Идентификатор комнаты:</label>
+                <input type="number" id="room_id" name="room_id" placeholder="например, 1">
+                <br>
+                <label for="type_param">Тип:</label>
+                <input type="text" id="type_param" name="type_param" placeholder="например, Стандарт">
+                <br>
+                <label for="cost_param">Максимальная стоимость за ночь:</label>
+                <input type="number" step="0.01" id="cost_param" name="cost_param" placeholder="например, 3000">
+                <br>
+                <button type="submit" name="search">Поиск</button>
+            </form>
+        {% elif selected_table == "Clients" %}
+            <h3>Фильтр по клиентам:</h3>
+            <form method="get">
+                <input type="hidden" name="table" value="Clients">
+                <label>Полное имя:</label><input type="text" name="fullname"><br>
+                <label>Год рождения:</label><input type="number" name="year_of_birth"><br>
+                <label>Пол (М/Ж):</label><input type="text" name="gender"><br>
+                <label>Имя пользователя:</label><input type="text" name="username_param"><br>
+                <button type="submit" name="search">Поиск</button>
+            </form>
+        {% elif selected_table == "Services" %}
+            <h3>Фильтр по услугам:</h3>
+            <form method="get">
+                <input type="hidden" name="table" value="Services">
+                <label>Название:</label><input type="text" name="name"><br>
+                <label>Макс. стоимость:</label><input type="number" step="0.01" name="cost"><br>
+                <label>Описание:</label><input type="text" name="description"><br>
+                <button type="submit" name="search">Поиск</button>
+            </form>
+        {% elif selected_table == "Posts" and request.user.is_staff %}
+            <h3>Фильтр по должностям:</h3>
+            <form method="get">
+                <input type="hidden" name="table" value="Posts">
+                <label>Название:</label><input type="text" name="post_name"><br>
+                <label>Макс. зарплата:</label><input type="number" step="0.01" name="salary"><br>
+                <label>Описание:</label><input type="text" name="post_description"><br>
+                <button type="submit" name="search">Поиск</button>
+            </form>
+        {% elif selected_table == "Staff" and request.user.is_staff %}
+            <h3>Фильтр по сотрудникам:</h3>
+            <form method="get">
+                <input type="hidden" name="table" value="Staff">
+                <label>Полное имя:</label><input type="text" name="staff_fullname"><br>
+                <label>Год рождения:</label><input type="number" name="staff_year_of_birth"><br>
+                <label>Пол (М/Ж):</label><input type="text" name="staff_gender"><br>
+                <label>Должность:</label>
+                <select name="staff_post_id" >
+                    <option value="">-- Выберите должность --</option>
+                    {% for post in post_list %}
+                        <option value="{{ post.0 }}">{{ post.1 }} руб/мес</option>
+                    {% endfor %}
+                </select>
+
+                <br>
+                <button type="submit" name="search">Поиск</button>
+            </form>
+        {% elif selected_table == "Bookings" %}
+            <h3>Фильтр по бронированиям:</h3>
+            <form method="get">
+                <input type="hidden" name="table" value="Bookings">
+                <label>Комната:</label>
+                <select name="booking_room_id" >
+                <option value="">-- Выберите комнату --</option>
+                    {% for room in room_list %}
+                        <option value="{{ room.0 }}">{{ room.1 }} руб/ночь</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <label>Гость:</label>
+                <select name="booking_client_id">
+                <option value="">-- Выберите гостя --</option>
+                    {% for client in client_list %}
+                        <option value="{{ client.0 }}">{{ client.1 }} г.р.</option>
+                    {% endfor %}
+                </select>
+
+                <br>
+                <label>Дата заезда:</label><input type="date" name="booking_check_in_date"><br>
+                <label>Количество ночей:</label><input type="number" name="booking_count_of_nights"><br>
+                <label>Макс. общая стоимость:</label><input type="number" step="0.01" name="booking_total_cost"><br>
+                <button type="submit" name="search">Поиск</button>
+            </form>
+        {% elif selected_table == "Provided_Services" %}
+            <h3>Фильтр по предоставленным услугам:</h3>
+            <form method="get">
+                <input type="hidden" name="table" value="Provided_Services">
+                <label>Бронирование:</label>
+                <select name="ps_booking_id" >
+                    <option value="">-- Выберите бронирование --</option>
+                    {% for booking in bookings %}
+                        <option value="{{ booking.0 }}" {% if value == booking.0 %}selected{% endif %}>
+                            {{ booking.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <br>
+                <label>Сотрудник:</label>
+                <select name="ps_staff_id">
+                    <option value="">-- Выберите сотрудника --</option>
+                    {% for staff in staff_list %}
+                        <option value="{{ staff.0 }}" {% if value == staff.0 %}selected{% endif %}>
+                            {{ staff.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <br>
+                <label>Услуга:</label>
+                <select name="ps_service_id">
+                <option value="">-- Выберите услугу --</option>
+                    {% for service in services %}
+                        <option value="{{ service.0 }}" {% if value == service.0 %}selected{% endif %}>
+                            {{ service.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <br>
+                <label>Количество услуг:</label><input type="number" name="ps_count_of_services"><br>
+                <label>Максимальная стоимость услуг:</label><input type="number" step="0.01" name="ps_total_service_cost"><br>
+                <button type="submit" name="search">Поиск</button>
+            </form>
+        {% endif %}
+    {% endif %}
+
+    {% if data %}
+        <h2>Содержимое таблицы: {{ selected_table|translate_table }}</h2>
+
+        <div class="cards-container">
+            {% for row in data.rows %}
+                <div class="card">
+                    {% for column, cell in data.columns|zip_lists:row %}
+                        {% if selected_table == "Rooms" and column == "Image_URL" %}
+                            <div style="text-align: center; margin-bottom: 10px;">
+                                <img src="{{ cell }}" width="100%" style="border-radius: 5px;">
+                            </div>
+                        {% else %}
+                            {% if cell|default:''|startswith:"http" %}
+                                <div style="text-align: center; margin-bottom: 10px;">
+                                    <img src="{{ cell }}" width="100%" style="border-radius: 5px;">
+                                </div>
+                            {% else %}
+                                <p><strong>{{ column|translate_column }}:</strong> {{ cell }}</p>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if not is_read_only %}
+                        <div class="card-actions" style="margin-top: 10px;">
+                            {% if selected_table == "Provided_Services" %}
+                                <a href="{% url 'edit_record_composite' selected_table row.0 row.1 row.2 %}" class="edit-button">Изменить</a>
+                                <a href="{% url 'delete_record_composite' selected_table row.0 row.1 row.2 %}" onclick="return confirm('Вы уверены, что хотите удалить эту запись?')" class="delete-button">Удалить</a>
+                            {% elif selected_table == "Clients" and not request.user.is_staff %}
+                                <a href="{% url 'edit_record' selected_table row.0 %}" class="edit-button">Изменить</a>
+                            {% elif selected_table == "Rooms" and request.user.is_staff %}
+                                <a href="{% url 'edit_record' selected_table row.1 %}" class="edit-button">Изменить</a>
+                                <a href="{% url 'delete_record' selected_table row.1 %}" onclick="return confirm('Вы уверены, что хотите удалить эту запись?')" class="delete-button">Удалить</a>
+                            {% else %}
+                                <a href="{% url 'edit_record' selected_table row.0 %}" class="edit-button">Изменить</a>
+                                <a href="{% url 'delete_record' selected_table row.0 %}" onclick="return confirm('Вы уверены, что хотите удалить эту запись?')" class="delete-button">Удалить</a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div style="margin-top: 20px; text-align:center;">
+            {% if data.page_obj.has_previous %}
+                <a href="?table={{ selected_table }}&page={{ data.page_obj.previous_page_number }}" style="margin-right: 10px;">Предыдущая</a>
+            {% endif %}
+
+            <span>Страница {{ data.page_obj.number }} из {{ data.page_obj.paginator.num_pages }}</span>
+
+            {% if data.page_obj.has_next %}
+                <a href="?table={{ selected_table }}&page={{ data.page_obj.next_page_number }}" style="margin-left: 10px;">Следующая</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+{% endblock body %}

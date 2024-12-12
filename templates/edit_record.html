@@ -1,0 +1,119 @@
+{% extends 'basic.html' %}
+{% block title %}Гостиница{% endblock title %}
+{% block body %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактировать запись</title>
+</head>
+<body>
+    <h1>Редактировать запись в {{ table }}</h1>
+
+    {% if errors %}
+        <div style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 20px;">
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        {% for column, value in columns|zip_lists:record %}
+            <label for="{{ column }}">{{ column|translate_column }}</label>
+            {% if column == 'Check_in_date' %}
+                <input type="date" id="{{ column }}" name="{{ column }}" value="{{ value }}" required>
+            {% elif column == 'Staff_ID' %}
+                <select id="{{ column }}" name="{{ column }}" disabled>
+                    {% for staff in staff_list %}
+                        <option value="{{ staff.0 }}" {% if value == staff.0 %}selected{% endif %}>
+                            {{ staff.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+            {% elif column == 'Gender' %}
+                <select id="{{ column }}" name="{{ column }}">
+                    <option value="Мужской" {% if value == 'Мужской' %}selected{% endif %}>Мужской</option>
+                    <option value="Женский" {% if value == 'Женский' %}selected{% endif %}>Женский</option>
+                </select>
+            {% elif column == 'Post_ID' %}
+                <select id="{{ column }}" name="{{ column }}">
+                    {% for post in post_choices %}
+                        <option value="{{ post.0 }}" {% if value == post.0 %}selected{% endif %}>
+                            {{ post.1 }} руб/мес
+                        </option>
+                    {% endfor %}
+                </select>
+            {% elif column == 'Client_ID' %}
+                {% if not request.user.is_staff %}
+                     <select id="{{ column }}" name="{{ column }}" disabled>
+                        {% for client in client_choices %}
+                            <option value="{{ client.0 }}" {% if value == client.0 %}selected{% endif %}>
+                                {{ client.1 }}
+                            </option>
+                        {% endfor %}
+                    </select>                   
+                {% else %}
+                    <select id="{{ column }}" name="{{ column }}">
+                        {% for client in client_choices %}
+                            <option value="{{ client.0 }}" {% if value == client.0 %}selected{% endif %}>
+                                {{ client.1 }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                {% endif %}
+            {% elif column == 'Image_URL' %}
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <img src="{{ value }}" width="1000" style="border-radius: 5px;" alt="Картинка">
+                </div>
+                <input type="text" id="{{ column }}" name="{{ column }}" value="{{ value }}">
+            {% elif column == 'Room_ID' and not table == 'Rooms' %}
+                <select id="{{ column }}" name="{{ column }}">
+                    {% for room in room_choices %}
+                        <option value="{{ room.0 }}" {% if value == room.0 %}selected{% endif %}>
+                            {{ room.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+            {% elif column == 'Room_ID' %}
+                <select id="{{ column }}" name="{{ column }}" disabled>
+                    {% for room in room_choices %}
+                        <option value="{{ room.0 }}" {% if value == room.0 %}selected{% endif %}>
+                            {{ room.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+            {% elif column == 'Booking_ID' %}
+            <select id="{{ column }}" name="{{ column }}" disabled>
+                {% for booking in bookings %}
+                    <option value="{{ booking.0 }}" {% if value == booking.0 %}selected{% endif %}>
+                        {{ booking.1 }}
+                    </option>
+                {% endfor %}
+            </select>
+            {% elif column == 'Service_ID' %}
+                <select id="{{ column }}" name="{{ column }}" disabled>
+                    {% for service in services %}
+                        <option value="{{ service.0 }}" {% if value == service.0 %}selected{% endif %}>
+                            {{ service.1 }} руб/мес
+                        </option>
+                    {% endfor %}
+                </select>
+            {% elif column == 'Username' %}
+                <input type="text" id="{{ column }}" name="{{ column }}" value="{{ value }}" readonly>
+            {% else %}
+                <input type="text" id="{{ column }}" name="{{ column }}" value="{{ value }}">
+            {% endif %}
+            <br>
+        {% endfor %}
+        <button type="submit">Сохранить</button>
+        <a href="/?table={{ table }}">Отмена</a>
+    </form>
+</body>
+</html>
+
+{% endblock body %}
